@@ -1,0 +1,63 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Movement : MonoBehaviour
+{
+    public Rigidbody rb;
+    public int speed;
+    public int movingspeed;
+    public AudioSource source;
+    public GameObject wall;
+    private bool goingup = true;
+
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        source = GetComponent<AudioSource>();
+        wall = transform.GetChild(0).gameObject; 
+        wall.transform.position = new Vector3(-8, -1, 0);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            goingup = !goingup;
+        }
+
+        rb.AddForce(Vector3.forward * Time.deltaTime * speed, ForceMode.Force);
+    }
+
+    private void FixedUpdate()
+    {
+        if (goingup)
+        {
+            rb.velocity = new Vector3(0, 5, 0);
+            rb.AddForce(Vector3.up * movingspeed, ForceMode.Force);
+            wall.transform.position = new Vector3(wall.transform.position.x, wall.transform.position.y - 0.05f, wall.transform.position.z);
+        }
+        else
+        {
+            rb.velocity = new Vector3(0, -5, 0);
+            rb.AddForce(Vector3.down * movingspeed, ForceMode.Force);
+            wall.transform.position = new Vector3(wall.transform.position.x, wall.transform.position.y + 0.05f, wall.transform.position.z);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.tag == ("enemy"))
+        {
+            source.Stop();
+            source.PlayDelayed(0);
+            rb.transform.position = new Vector3(0, 0, -20);
+            wall.transform.position = new Vector3(-8, -1, -20);
+        }
+        
+    }
+}
